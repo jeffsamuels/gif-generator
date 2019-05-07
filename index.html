@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Gif Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<div class=container>
+
+<h1>Favorite Actor Gif Generator</h1>
+
+<div id="buttons-view"></div>
+
+<form id="topic-form">
+    <label for="topic-input"></label>
+    <input type="text" id="topic-input">
+    <br>
+
+    <input id="add-topic" type="submit" value="Add your favorite actor!">
+  </form>
+
+    <div id="topics-view"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+     
+
+
+     
+      var topics = ["Gary Oldman", "Greta Gerwig", "Willem Dafoe", "Rooney Mara"];
+
+      
+      function displayTopicInfo() {
+
+        var topic = $(this).attr("data-name");
+        
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        topic + "&api_key=X6K2pORiWZ7cDG68XhcABgTt8I1krKSA&limit=10";
+       
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).then(function(response) {
+            console.log(response)
+
+        var results = response.data;
+
+        for (var i = 0; i < results.length; i++) {
+
+if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+
+  var gifDiv = $("<div>");
+
+ 
+  var rating = results[i].rating;
+
+
+  var personImage = $("<img>");
+
+  personImage.attr("src", results[i].images.fixed_height_still.url);
+  personImage.attr("data-state", "still");
+  personImage.attr("class", "gif");
+  personImage.attr("data-animated", results[i].images.fixed_height.url);
+  personImage.attr("data-still", results[i].images.fixed_height_still.url);
+
+   var p = $("<p>").text("Rating: " + rating);
+
+  gifDiv.append(personImage);
+  gifDiv.append(p);
+
+ 
+  $("#topics-view").prepend(gifDiv);
+}
+}
+ });
+}
+function renderButtons() {
+
+ $("#buttons-view").empty();
+
+      
+for (var i = 0; i < topics.length; i++) {
+
+var a = $("<button>");
+    
+          a.addClass("topic-btn");
+     
+          a.attr("data-name", topics[i]);
+       
+          a.text(topics[i]);
+   
+$("#buttons-view").append(a);
+ }
+}
+
+ $("#add-topic").on("click", function(event) {
+event.preventDefault();
+     
+        var topic = $("#topic-input").val().trim();
+        topics.push(topic);
+
+       
+        renderButtons();
+      });
+
+    
+    $(document).on("click", ".topic-btn", displayTopicInfo);
+
+      renderButtons();
+
+//// Above code was mainly borrowed from Working Movie App and Button Triggered AJAX daily activities. 
+//// Code below is from Pausing Gifs but I can't seem to get it to go. Maybe it's in the wrong scope or 
+//// something else is out of whack.
+
+      $(".gif").on("click", function() {
+      
+      let animatedUrl = $(this).attr("data-animated")
+      let stillUrl = $(this).attr("data-still")
+      let state = $(this).attr("data-state");
+     
+      if (state === "still") {
+        $(this).attr("src", animatedUrl);
+        $(this).attr("data-state", "animated");
+      } 
+      else {
+        $(this).attr("src", stillUrl);
+        $(this).attr("data-state", "still");
+      }
+    })
+
+    </script>
+
+</div>
+
+
+
+</body>
+</html>
